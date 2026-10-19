@@ -31,28 +31,46 @@ def predict_fraud(amount, tx_freq_1h, distance_km, channel, merchant_type):
     elif prob >= 0.3:
         action = "⚠️ ความเสี่ยงปานกลาง: ส่ง SMS ขอรหัส OTP ยืนยันตัวตนผู้ถือบัตร"
     else:
-        action = "✅ ความเสี่ยงต่ำ: ออนุมัติทำรายการสำเร็จ"
+        action = "✅ ความเสี่ยงต่ำ: อนุมัติทำรายการสำเร็จ"
 
     return labels, action
 
-# 3. สร้าง UI ด้วย Gradio Blocks
-with gr.Blocks(theme=gr.themes.Soft()) as demo:
-    gr.Markdown("# 💳 ระบบตรวจจับการทุจริตธุรกรรมบัตรเครดิต (Fraud Detection System)")
-    gr.Markdown("ระบบจำลองการตัดสินใจอัตโนมัติตามกรอบ CRISP-DM เพื่อช่วยลดความเสียหายและป้องกันการอายัดบัตรผู้บริสุทธิ์")
+# 3. สร้าง UI ด้วย Gradio Blocks ธีม Monochrome (ขาว-ดำ-เทา เรียบหรู)
+custom_theme = gr.themes.Monochrome(
+    primary_hue="neutral",
+    secondary_hue="neutral",
+)
 
+with gr.Blocks(theme=custom_theme) as demo:
+    # ส่วนหัวข้อหลัก
     with gr.Row():
-        with gr.Column(scale=1):
+        gr.Markdown(
+            """
+            # 💳 ระบบตรวจจับการทุจริตธุรกรรมบัตรเครดิต
+            *ระบบจำลองการประเมินความเสี่ยงและตัดสินใจอัตโนมัติ (Automated Fraud Detection)*  
+            กรอกข้อมูลรายละเอียดการทำรายการด้านล่างเพื่อให้ระบบวิเคราะห์ความผิดปกติแบบ Real-time
+            """
+        )
+
+    with gr.Row(equal_height=True):
+        # คอลัมน์ซ้าย: สำหรับกรอกข้อมูล (Input Form)
+        with gr.Column(scale=1, variant="panel"):
+            gr.Markdown("### 📝 ข้อมูลการทำรายการ (Transaction Details)")
             amount_input = gr.Number(label="ยอดเงินที่ใช้ (บาท)", value=1500.0)
-            freq_input = gr.Slider(label="ความถี่การใช้บัตรใน 1 ชม.", minimum=0, maximum=10, value=1, step=1)
+            freq_input = gr.Slider(label="ความถี่การใช้บัตรใน 1 ชม. (ครั้ง)", minimum=0, maximum=10, value=1, step=1)
             dist_input = gr.Number(label="ระยะห่างจากที่อยู่ประจำ (กม.)", value=5.0)
             channel_input = gr.Dropdown(label="ช่องทางชำระเงิน", choices=["Online", "POS_Swipe", "Contactless"], value="Online")
             merchant_input = gr.Dropdown(label="ประเภทร้านค้า", choices=["Dining", "Digital_Goods", "Luxury", "Travel", "Retail"], value="Dining")
-            btn_predict = gr.Button("🚀 ประเมินความเสี่ยง", variant="primary")
+            
+            btn_predict = gr.Button("🚀 ประเมินความเสี่ยง", variant="primary", size="lg")
 
-        with gr.Column(scale=1):
-            output_label = gr.Label(label="ระดับความน่าจะเป็น")
-            output_action = gr.Textbox(label="คำสั่งระบบอัตโนมัติ (Action Automation)", lines=2)
+        # คอลัมน์ขวา: สำหรับแสดงผลลัพธ์ (Output Results)
+        with gr.Column(scale=1, variant="compact"):
+            gr.Markdown("### 📊 ผลการวิเคราะห์จากระบบ (AI Evaluation)")
+            output_label = gr.Label(label="ระดับความน่าจะเป็น (Probability)")
+            output_action = gr.Textbox(label="คำสั่งระบบอัตโนมัติ (Action Automation)", lines=3)
 
+    # ผูกปุ่มกดเข้ากับฟังก์ชัน
     btn_predict.click(
         fn=predict_fraud,
         inputs=[amount_input, freq_input, dist_input, channel_input, merchant_input],
