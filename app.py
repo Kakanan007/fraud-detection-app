@@ -35,10 +35,10 @@ def predict_fraud(amount, tx_freq_1h, distance_km, channel, merchant_type):
 
     return labels, action
 
-# 3. สร้าง UI ด้วย Gradio Blocks ธีม Monochrome (ขาว-ดำ-เทา เรียบหรู)
-custom_theme = gr.themes.Monochrome(
-    primary_hue="neutral",
-    secondary_hue="neutral",
+# 3. สร้าง UI ด้วย Gradio Blocks ธีม Glass (กระจกใส ทันสมัย)
+custom_theme = gr.themes.Glass(
+    primary_hue="cyan",
+    secondary_hue="blue",
 )
 
 with gr.Blocks(theme=custom_theme) as demo:
