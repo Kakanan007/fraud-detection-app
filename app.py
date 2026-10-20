@@ -35,13 +35,31 @@ def predict_fraud(amount, tx_freq_1h, distance_km, channel, merchant_type):
 
     return labels, action
 
-# 3. สร้าง UI ด้วย Gradio Blocks ธีม Glass (กระจกใส ทันสมัย)
-custom_theme = gr.themes.Glass(
-    primary_hue="cyan",
-    secondary_hue="blue",
+# 3. Custom CSS สำหรับเปลี่ยนภาพพื้นหลัง (อิงจากไฟล์ bg.png ที่อัปโหลดขึ้น GitHub)
+custom_css = """
+body {
+    background-image: url('file=bg.png') !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+/* ทำให้กล่องแอปมีความโปร่งแสงเล็กน้อยเพื่อให้มองเห็นพื้นหลังชัดเจนขึ้น */
+.gradio-container {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+"""
+
+# 4. สร้าง UI ด้วย Gradio Blocks ธีม Monochrome (ขาว-ดำ-เทา) และใส่ CSS พื้นหลัง
+custom_theme = gr.themes.Monochrome(
+    primary_hue="neutral",
+    secondary_hue="neutral",
 )
 
-with gr.Blocks(theme=custom_theme) as demo:
+with gr.Blocks(theme=custom_theme, css=custom_css) as demo:
     # ส่วนหัวข้อหลัก
     with gr.Row():
         gr.Markdown(
@@ -77,5 +95,5 @@ with gr.Blocks(theme=custom_theme) as demo:
         outputs=[output_label, output_action]
     )
 
-# 4. รันสำหรับเซิร์ฟเวอร์ Render
+# 5. รันสำหรับเซิร์ฟเวอร์ Render
 demo.launch(server_name="0.0.0.0", server_port=10000)
